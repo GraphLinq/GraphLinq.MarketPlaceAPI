@@ -29,7 +29,7 @@ class Bootstrap{
     }
 
     private loadPaths(){
-        this.server.use('/user',user)
+        this.server.use('/wallets',user)
     }
 }
 

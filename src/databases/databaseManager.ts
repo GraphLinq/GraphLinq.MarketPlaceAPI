@@ -20,7 +20,7 @@ export default class DatabaseManager{
                 password: this.pwd,
                 database: this.db_name,
                 entities: [
-                    "./dist/database/entities/*.js"
+                    "./dist/databases/entities/*.js"
                 ],
                 synchronize: true,
                 logging: false
