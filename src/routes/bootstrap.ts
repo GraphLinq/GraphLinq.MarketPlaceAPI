@@ -15,7 +15,7 @@ class Bootstrap{
     public async init() : Promise<void>{
         return new Promise<void>((resolve) => {
             this.server = express()
-            this.server.use(bodyParser.json({limit: '50mb'}))
+            this.server.use(express.json({limit: '50mb'}))
             this.server.use(cors())    
             this.loadPaths()
 
