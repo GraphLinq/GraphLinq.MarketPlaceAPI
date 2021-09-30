@@ -98,4 +98,26 @@ router.get('/:user_id/templates/published',authentification,async(req,res) => {
   }
   
 })
+
+router.get('/:user_id/templates/purchased',authentification,async(req,res) => {
+
+  try{
+      let user_id : number | undefined = Number(req.params.user_id)
+      let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
+
+      var templatesPurchased = Promise.all(user.purchasedTemplates.map(async x => 
+        await getConnection().getRepository(Templates).findOne({id : Number(x)})
+      ))
+
+      return res.send({
+        templates : await templatesPurchased
+      })
+ 
+  }catch (error){
+
+    return res.status(500).send();
+  }
+  
+})
+
 export default router;

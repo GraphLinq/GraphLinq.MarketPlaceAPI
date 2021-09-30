@@ -34,6 +34,10 @@ export default class Users {
   @Column("simple-array",{name : "published_templates" })
   publishedTemplates : number[]
   
+  @Column("simple-array",{name : "purchased_templates" })
+  purchasedTemplates : number[]
+  
+
   @Column("datetime", {
     name: "created_at",
     nullable: true,
