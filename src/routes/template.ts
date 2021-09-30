@@ -1,6 +1,9 @@
 import express = require("express");
 import { getConnection } from "typeorm";
 import Templates from "../databases/entities/Templates" 
+import authentification from "../middlewares/authentification";
+import Users from "../databases/entities/Users" 
+import Likes from "../databases/entities/Likes" 
 
 
 var router = express.Router();
@@ -36,7 +39,7 @@ router.get('/',async(req,res) => {
             }// price low -> hight
             else if(sort == 2){
                 builder = builder.orderBy("template.template_cost","ASC")   
-            }// price hight -> lo<
+            }// price hight -> low
             else if(sort == 3){
                 builder = builder.orderBy("template.template_cost","DESC")   
             }
@@ -55,5 +58,60 @@ router.get('/',async(req,res) => {
     
 })
 
+router.post('/:template_id/likes',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+
+        let target: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let likeTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+                                                                            .findOne({template_id : Number(req.params.template_id),
+                                                                                      user_id : target.id})
+        // there has not yet been a like in the template                                                                       
+        if(likeTemplate == undefined){
+            await getConnection().getRepository(Likes).save({
+                template_id : Number(req.params.template_id),
+                user_id : target.id
+            })
+
+            return res.status(200).send({success : true})
+        }else{
+            return res.status(500).send()
+        }
+
+    }catch (error){
+
+      return res.status(500).send();
+    }
+    
+})
+
+
+router.delete('/:template_id/likes',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+
+        let target: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let likeTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+                                                                            .findOne({template_id : Number(req.params.template_id),
+                                                                                      user_id : target.id})
+        // there has not yet been a like in the template                                                                       
+        if(likeTemplate != undefined){
+            await getConnection().getRepository(Likes).remove(likeTemplate)
+
+            return res.status(200).send({success : true})
+        }else{
+            return res.status(500).send()
+        }
+
+    }catch (error){
+
+      return res.status(500).send();
+    }
+    
+})
 
 export default router;
