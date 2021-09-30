@@ -32,7 +32,7 @@ router.get('/',async(req,res) => {
 
         if(sort != undefined){
              
-            // todo : make this more dynamic after / for test
+            // todo : make this more dynamic after / actualy for test
             // sort by recently added
             if(sort == 0){
                 builder = builder.orderBy("template.createdAt","DESC")     
@@ -56,6 +56,27 @@ router.get('/',async(req,res) => {
       return res.status(500).send();
     }
     
+})
+
+router.get('/:name',async(req,res)=>{
+    try{
+        let name:string = req.params.name
+
+        var builder = await getConnection().getRepository(Templates)
+                  .createQueryBuilder("template")
+                  .where("template.name like :n", { n:`%${name}%` });
+
+        var resultsQuery = await builder.getMany()
+
+        res.status(200).send({
+            results : resultsQuery
+        }) 
+                   
+    }catch (error)
+    {
+      console.error(error);
+      return res.status(500).send();
+    }
 })
 
 router.post('/:template_id/likes',authentification,async(req,res)=>{
