@@ -6,6 +6,7 @@ import {validate} from "class-validator";
 import env from "../interfaces/env"
 import Users from "../databases/entities/Users" 
 import authentification from "../middlewares/authentification";
+import Templates from "../databases/entities/Templates";
 
 var router = express.Router();
 
@@ -41,7 +42,7 @@ router.post('/auth',async(req,res) => {
       }
 })
 
-router.put('/profile/:user_id',authentification,async(req,res) => {
+router.put('/:user_id/profile/',authentification,async(req,res) => {
       const authentification : any = (req as any).authentification
       var address: string  = String(authentification.address)
 
@@ -77,4 +78,24 @@ router.put('/profile/:user_id',authentification,async(req,res) => {
       
 })
 
+router.get('/:user_id/templates/published',authentification,async(req,res) => {
+
+  try{
+      let user_id : number | undefined = Number(req.params.user_id)
+      let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
+
+      var templatesPublished = Promise.all(user.publishedTemplates.map(async x => 
+        await getConnection().getRepository(Templates).findOne({id : Number(x)})
+      ))
+
+      return res.send({
+        templates : await templatesPublished
+      })
+ 
+  }catch (error){
+
+    return res.status(500).send();
+  }
+  
+})
 export default router;

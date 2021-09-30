@@ -31,6 +31,8 @@ export default class Users {
   @Column("varchar",{name : "token",nullable : true,length : 255})
   token : string | null
 
+  @Column("simple-array",{name : "published_templates" })
+  publishedTemplates : number[]
   
   @Column("datetime", {
     name: "created_at",
