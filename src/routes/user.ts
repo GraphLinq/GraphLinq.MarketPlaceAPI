@@ -37,7 +37,6 @@ router.post('/auth',async(req,res) => {
       }
       catch (error)
       {
-        console.error(error);
         return res.status(500).send();
       }
 })
@@ -66,7 +65,7 @@ router.put('/profile/:user_id',authentification,async(req,res) => {
               })
             )
           })
-          
+
         }else{
           return res.send({success : true})
         }

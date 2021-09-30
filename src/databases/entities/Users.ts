@@ -1,16 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 import {
-  validate,
-  validateOrReject,
-  Contains,
-  IsInt,
-  Length,
-  IsEmail,
-  IsFQDN,
-  IsDate,
-  Min,
-  Max,
   MaxLength,
   MinLength,
 } from 'class-validator';
