@@ -43,6 +43,7 @@ router.post('/auth',async(req,res) => {
 })
 
 router.put('/:user_id/profile/',authentification,async(req,res) => {
+
       const authentification : any = (req as any).authentification
       var address: string  = String(authentification.address)
 
@@ -60,7 +61,7 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
 
         if(errors.length > 0){
 
-          return res.status(500).send({
+          return res.send({
             success : false,
             "errors" : errors.map(x => 
              ({
@@ -81,20 +82,24 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
       
 })
 
-router.get('/:user_id/templates/published',authentification,async(req,res) => {
+router.get('/:user_id/templates/published',async(req,res) => {
 
   try{
       let user_id : number | undefined = Number(req.params.user_id)
       let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
 
-      var templatesPublished = Promise.all(user.publishedTemplates.map(async x => 
-        await getConnection().getRepository(Templates).findOne({id : Number(x)})
-      ))
-
-      return res.send({
-        templates : await templatesPublished
-      })
- 
+      if(user == undefined){
+        return res.status(500).send()
+      }else{
+        var templatesPublished = Promise.all(user.publishedTemplates.map(async x => 
+          await getConnection().getRepository(Templates).findOne({id : Number(x)})
+        ))
+  
+        return res.send({
+          templates : await templatesPublished
+        })
+      }
+      
   }catch (error){
 
     return res.status(500).send();
@@ -102,20 +107,25 @@ router.get('/:user_id/templates/published',authentification,async(req,res) => {
   
 })
 
-router.get('/:user_id/templates/purchased',authentification,async(req,res) => {
+router.get('/:user_id/templates/purchased',async(req,res) => {
 
   try{
       let user_id : number | undefined = Number(req.params.user_id)
       let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
 
-      var templatesPurchased = Promise.all(user.purchasedTemplates.map(async x => 
-        await getConnection().getRepository(Templates).findOne({id : Number(x)})
-      ))
+      if(user == undefined){
+        return res.status(500).send()
+      }else{
 
-      return res.send({
-        templates : await templatesPurchased
-      })
- 
+        var templatesPurchased = Promise.all(user.purchasedTemplates.map(async x => 
+          await getConnection().getRepository(Templates).findOne({id : Number(x)})
+        ))
+  
+        return res.send({
+          templates : await templatesPurchased
+        })
+      }
+
   }catch (error){
 
     return res.status(500).send();

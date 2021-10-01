@@ -4,6 +4,8 @@ import Templates from "../databases/entities/Templates"
 import authentification from "../middlewares/authentification";
 import Users from "../databases/entities/Users" 
 import Likes from "../databases/entities/Likes" 
+import Categories from "../databases/entities/Categories";
+import {validate} from "class-validator";
 
 
 var router = express.Router();
@@ -49,7 +51,7 @@ router.get('/',async(req,res) => {
         builder = builder.leftJoinAndSelect("template.user", "user")
         
         var resultsQuery = await builder.getMany()
-        res.status(200).send({
+        res.send({
             success : true,
             results : resultsQuery
         })
@@ -61,6 +63,54 @@ router.get('/',async(req,res) => {
     
 })
 
+router.post('/',authentification,async(req,res)=>{
+
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+    try{
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let user_id:number | undefined =  Number(req.body.user_id)
+
+        if(user.id != user_id){
+            return res.status(500).send()
+        }
+
+        let template = new Templates()
+        template.name = req.body.name
+        template.description = req.body.description
+        template.template_cost = req.body.template_cost
+        template.user = user
+        template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
+        template.execution_cost =  req.body.execution_cost
+        template.current_version =  req.body.current_version
+
+        const errors = await validate(template)
+
+        if(errors.length > 0){
+
+          return res.send({
+            success : false,
+            "errors" : errors.map(x => 
+             ({
+                name : x.property,
+                messages  : x.constraints
+              })
+            )
+          })
+
+        }else{
+
+          await getConnection().getRepository(Templates).save(template)
+          return res.send({success : true})
+        }
+
+    }catch(error){
+
+        console.log(error)
+        return res.status(500).send();
+    }
+})
+
 router.get('/names/:name',async(req,res)=>{
     try{
         let name:string = req.params.name
@@ -69,8 +119,11 @@ router.get('/names/:name',async(req,res)=>{
                   .createQueryBuilder("template")
                   .where("template.name like :n", { n:`%${name}%` });
 
+        builder = builder.leftJoinAndSelect("template.category", "category")
+        builder = builder.leftJoinAndSelect("template.user", "user")
+
         var resultsQuery = await builder.getMany()
-        res.status(200).send({
+        res.send({
             success : true,
             results : resultsQuery
         }) 

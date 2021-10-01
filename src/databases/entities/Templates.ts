@@ -46,11 +46,19 @@ export default class Templates {
   @Column("decimal")
   current_version : string
 
-
-
-  @Column("datetime")
+  @Column("datetime", {
+    name: "created_at",
+    nullable: true,
+    default: () => "CURRENT_TIMESTAMP",
+    select: false
+  })  
   createdAt: Date;
 
-  @Column("datetime")
+  @Column("datetime", {
+    name: "updated_at",
+    nullable: true,
+    default: () => "CURRENT_TIMESTAMP",
+    select: false
+  })
   updatedAt: Date;
 }
