@@ -51,6 +51,7 @@ export default class Users {
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
     select: false
+
   })
   updatedAt: Date | null;
 

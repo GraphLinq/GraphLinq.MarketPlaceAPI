@@ -45,6 +45,13 @@ export default class Templates {
 
   @Column("decimal")
   current_version : string
+  
+  @Column("text",{
+    name: "raw_bytes",
+    nullable: true,
+    select: false
+  })
+  raw_bytes : string
 
   @Column("datetime", {
     name: "created_at",

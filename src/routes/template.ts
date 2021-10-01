@@ -69,11 +69,7 @@ router.post('/',authentification,async(req,res)=>{
     var address: string  = String(authentification.address)
     try{
         let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
-        let user_id:number | undefined =  Number(req.body.user_id)
 
-        if(user.id != user_id){
-            return res.status(500).send()
-        }
 
         let template = new Templates()
         template.name = req.body.name
@@ -81,8 +77,9 @@ router.post('/',authentification,async(req,res)=>{
         template.template_cost = req.body.template_cost
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
-        template.execution_cost =  req.body.execution_cost
-        template.current_version =  req.body.current_version
+        template.execution_cost =  "0"
+        template.current_version =  "0"
+        template.raw_bytes = req.body.data
 
         const errors = await validate(template)
 
@@ -90,7 +87,7 @@ router.post('/',authentification,async(req,res)=>{
 
           return res.send({
             success : false,
-            "errors" : errors.map(x => 
+            "errors" : errors.map(x =>  
              ({
                 name : x.property,
                 messages  : x.constraints
