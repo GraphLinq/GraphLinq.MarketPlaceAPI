@@ -25,16 +25,16 @@ export default class Users {
   @Column("varchar",{name : "publisher_name",nullable : true,length : 255})
   publisherName : string | null
 
-  @Column("varchar",{name : "public_address",nullable : true,length : 255})
+  @Column("varchar",{name : "public_address",nullable : true,length : 255,select: false})
   publicAddress : string | null
 
-  @Column("varchar",{name : "token",nullable : true,length : 255})
+  @Column("varchar",{name : "token",nullable : true,length : 255,select: false})
   token : string | null
 
-  @Column("simple-array",{name : "published_templates" })
+  @Column("simple-array",{name : "published_templates", nullable: true})
   publishedTemplates : number[]
   
-  @Column("simple-array",{name : "purchased_templates" })
+  @Column("simple-array",{name : "purchased_templates" , nullable: true ,select: false})
   purchasedTemplates : number[]
   
 
@@ -42,6 +42,7 @@ export default class Users {
     name: "created_at",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
+    select: false
   })
   createdAt: Date | null;
 
@@ -49,6 +50,7 @@ export default class Users {
     name: "updated_at",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
+    select: false
   })
   updatedAt: Date | null;
 

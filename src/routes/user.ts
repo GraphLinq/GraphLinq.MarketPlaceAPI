@@ -57,8 +57,11 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
         
         user.name = req.body.name
         const errors = await validate(user)
+
         if(errors.length > 0){
+
           return res.status(500).send({
+            success : false,
             "errors" : errors.map(x => 
              ({
                 name : x.property,

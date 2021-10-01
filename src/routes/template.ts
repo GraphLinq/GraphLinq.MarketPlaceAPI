@@ -11,10 +11,8 @@ var router = express.Router();
 router.get('/',async(req,res) => {
 
     try{
-        const category: number = Number(req.query.category)
-        const page : number = Number(req.query.page)
-        const limit : number = Number(req.query.limit)
-        const sort : number = Number(req.query.sort)
+        const page : number | undefined  = Number(req.query.page)
+        const limit : number | undefined  = Number(req.query.limit)
 
         if( page == undefined || limit == undefined){
             return res.status(500).send()
@@ -24,14 +22,16 @@ router.get('/',async(req,res) => {
         .createQueryBuilder('template')
         
     
-        if(category != undefined){
+        if(req.query.category != undefined){
+            const category: number | undefined = Number(req.query.category)
             builder = builder.where("template.category_id = :filter",{filter : category})
         }
     
         builder = builder.offset((page - 1) * limit).limit(limit)
 
-        if(sort != undefined){
+        if(req.query.sort != undefined){
              
+            const sort : number | undefined  = Number(req.query.sort)
             // todo : make this more dynamic after / actualy for test
             // sort by recently added
             if(sort == 0){
@@ -44,21 +44,24 @@ router.get('/',async(req,res) => {
                 builder = builder.orderBy("template.template_cost","DESC")   
             }
         }
-
+        
+        builder = builder.leftJoinAndSelect("template.category", "category")
+        builder = builder.leftJoinAndSelect("template.user", "user")
+        
         var resultsQuery = await builder.getMany()
         res.status(200).send({
+            success : true,
             results : resultsQuery
         })
 
     }catch (error)
     {
-      console.error(error);
       return res.status(500).send();
     }
     
 })
 
-router.get('/:name',async(req,res)=>{
+router.get('/names/:name',async(req,res)=>{
     try{
         let name:string = req.params.name
 
@@ -67,14 +70,13 @@ router.get('/:name',async(req,res)=>{
                   .where("template.name like :n", { n:`%${name}%` });
 
         var resultsQuery = await builder.getMany()
-
         res.status(200).send({
+            success : true,
             results : resultsQuery
         }) 
                    
     }catch (error)
     {
-      console.error(error);
       return res.status(500).send();
     }
 })
@@ -96,9 +98,9 @@ router.post('/:template_id/likes',authentification,async(req,res)=>{
                 user_id : target.id
             })
 
-            return res.status(200).send({success : true})
+            return res.send({success : true})
         }else{
-            return res.status(500).send()
+            return res.send({success : false})
         }
 
     }catch (error){
@@ -117,15 +119,15 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
 
         let target: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
         let likeTemplate : Likes | undefined = await getConnection().getRepository(Likes)
-                                                                            .findOne({template_id : Number(req.params.template_id),
+                                                                    .findOne({template_id : Number(req.params.template_id),
                                                                                       user_id : target.id})
         // there has not yet been a like in the template                                                                       
         if(likeTemplate != undefined){
             await getConnection().getRepository(Likes).remove(likeTemplate)
 
-            return res.status(200).send({success : true})
+            return res.send({success : true})
         }else{
-            return res.status(500).send()
+            return res.send({success : false})
         }
 
     }catch (error){

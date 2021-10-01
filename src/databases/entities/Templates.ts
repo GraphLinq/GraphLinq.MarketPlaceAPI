@@ -1,9 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,ManyToOne} from "typeorm";
 
 import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import Categories from "./Categories";
+import Users from "./Users";
 
 @Entity("templates", { schema: "graphlinq" })
 export default class Templates {
@@ -26,11 +28,14 @@ export default class Templates {
   @Column("text")
   description : string | null
 
-  @Column("int")
-  user_id : number
+  @ManyToOne(type => Users)
+  @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
+  user : Users
 
-  @Column("int")
-  category_id : number
+  @ManyToOne(type => Categories )
+  @JoinColumn({name: 'category_id', referencedColumnName: 'id'})
+  category : Categories
+
   
   @Column("decimal")
   template_cost : string
