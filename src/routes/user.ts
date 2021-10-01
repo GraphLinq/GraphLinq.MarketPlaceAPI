@@ -86,17 +86,21 @@ router.get('/:user_id/templates/published',async(req,res) => {
 
   try{
       let user_id : number | undefined = Number(req.params.user_id)
-      let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
+
+      let user: Users | undefined = await getConnection()
+      .getRepository(Users)
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.publishedTemplates", "template")
+      .getOne();
+      //let user: Users | undefined = await getConnection().getRepository(Users).find({id: user_id, relations : ["publishedTemplates"]})
 
       if(user == undefined){
         return res.status(500).send()
       }else{
-        var templatesPublished = Promise.all(user.publishedTemplates.map(async x => 
-          await getConnection().getRepository(Templates).findOne({id : Number(x)})
-        ))
-  
+
+
         return res.send({
-          templates : await templatesPublished
+          templates :  user.publishedTemplates
         })
       }
       
