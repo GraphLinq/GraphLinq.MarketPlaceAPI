@@ -80,9 +80,9 @@ router.post('/',authentification,async(req,res)=>{
         template.template_cost = req.body.template_cost
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
-        template.execution_cost =  "0"
-        template.current_version =  "0"
-        template.raw_bytes = req.body.data
+        template.execution_cost =  "0" // todo : get the cost with api
+        template.current_version =  "0" // todo : incoming version system
+        template.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
 
         const errors = await validate(template)
 

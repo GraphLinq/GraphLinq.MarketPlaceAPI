@@ -3,6 +3,8 @@ import { Column, Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,ManyToOne, 
 import {
   MaxLength,
   MinLength,
+  IsDecimal,
+  IsInt
 } from 'class-validator';
 import Categories from "./Categories";
 import Users from "./Users";
@@ -40,7 +42,10 @@ export default class Templates {
   @OneToMany(type => Likes, like => like.template)
   likes : Likes[]
 
-  @Column("decimal")
+  @IsInt({
+    message : 'The price of the template is not integer'
+  })
+  @Column("int")
   template_cost : string
 
   @Column("decimal")
