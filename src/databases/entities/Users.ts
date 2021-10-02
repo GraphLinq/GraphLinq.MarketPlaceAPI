@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn,JoinColumn } from "typeorm";
 
 import {
   MaxLength,
@@ -32,11 +32,9 @@ export default class Users {
   @Column("varchar",{name : "token",nullable : true,length : 255,select: false})
   token : string | null
 
-  /*@Column("simple-array",{name : "published_templates", nullable: true})
-  publishedTemplates : number[]*/
   @OneToMany(type => Templates, template => template.user )
   publishedTemplates : Templates[]
-  
+
   @Column("simple-array",{name : "purchased_templates" , nullable: true ,select: false})
   purchasedTemplates : number[]
   

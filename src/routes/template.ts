@@ -6,6 +6,7 @@ import Users from "../databases/entities/Users"
 import Likes from "../databases/entities/Likes" 
 import Categories from "../databases/entities/Categories";
 import {validate} from "class-validator";
+import { UniqueMetadataArgs } from "typeorm/metadata-args/UniqueMetadataArgs";
 
 
 var router = express.Router();
@@ -49,7 +50,8 @@ router.get('/',async(req,res) => {
         
         builder = builder.leftJoinAndSelect("template.category", "category")
         builder = builder.leftJoinAndSelect("template.user", "user")
-        
+        builder = builder.leftJoinAndSelect("template.likes", "like")
+
         var resultsQuery = await builder.getMany()
         res.send({
             success : true,
@@ -58,6 +60,7 @@ router.get('/',async(req,res) => {
 
     }catch (error)
     {
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -118,6 +121,7 @@ router.get('/names/:name',async(req,res)=>{
 
         builder = builder.leftJoinAndSelect("template.category", "category")
         builder = builder.leftJoinAndSelect("template.user", "user")
+        builder = builder.leftJoinAndSelect("template.likes", "like")
 
         var resultsQuery = await builder.getMany()
         res.send({
@@ -137,15 +141,18 @@ router.post('/:template_id/likes',authentification,async(req,res)=>{
 
     try{
 
-        let target: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
-        let likeTemplate : Likes | undefined = await getConnection().getRepository(Likes)
-                                                                            .findOne({template_id : Number(req.params.template_id),
-                                                                                      user_id : target.id})
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined = await getConnection().getRepository(Templates)
+                                                                    .findOne({id : Number(req.params.template_id)})
+
+        let targetTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+                                                                            .findOne({template : template,
+                                                                                      user_id : user.id})
         // there has not yet been a like in the template                                                                       
-        if(likeTemplate == undefined){
+        if(targetTemplate == undefined){
             await getConnection().getRepository(Likes).save({
-                template_id : Number(req.params.template_id),
-                user_id : target.id
+                user_id : user.id,
+                template : template
             })
 
             return res.send({success : true})
@@ -167,13 +174,16 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
 
     try{
 
-        let target: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
-        let likeTemplate : Likes | undefined = await getConnection().getRepository(Likes)
-                                                                    .findOne({template_id : Number(req.params.template_id),
-                                                                                      user_id : target.id})
-        // there has not yet been a like in the template                                                                       
-        if(likeTemplate != undefined){
-            await getConnection().getRepository(Likes).remove(likeTemplate)
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined = await getConnection().getRepository(Templates)
+        .findOne({id : Number(req.params.template_id)})
+
+        let targetTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+                                                                            .findOne({template : template,
+                                                                                      user_id : user.id})
+        // there has been a like in the template                                                                       
+        if(targetTemplate != undefined){
+            await getConnection().getRepository(Likes).remove(targetTemplate)
 
             return res.send({success : true})
         }else{

@@ -92,7 +92,6 @@ router.get('/:user_id/templates/published',async(req,res) => {
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.publishedTemplates", "template")
       .getOne();
-      //let user: Users | undefined = await getConnection().getRepository(Users).find({id: user_id, relations : ["publishedTemplates"]})
 
       if(user == undefined){
         return res.status(500).send()

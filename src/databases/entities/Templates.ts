@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,ManyToOne} from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,ManyToOne, JoinTable, ManyToMany, OneToMany} from "typeorm";
 
 import {
   MaxLength,
@@ -6,8 +6,9 @@ import {
 } from 'class-validator';
 import Categories from "./Categories";
 import Users from "./Users";
+import Likes from "./Likes";
 
-@Entity("templates", { schema: "graphlinq" })
+@Entity("market_templates", { schema: "graphlinq" })
 export default class Templates {
   @PrimaryGeneratedColumn()
   id: number;
@@ -36,7 +37,9 @@ export default class Templates {
   @JoinColumn({name: 'category_id', referencedColumnName: 'id'})
   category : Categories
 
-  
+  @OneToMany(type => Likes, like => like.template)
+  likes : Likes[]
+
   @Column("decimal")
   template_cost : string
 
@@ -51,6 +54,7 @@ export default class Templates {
     nullable: true,
     select: false
   })
+
   raw_bytes : string
 
   @Column("datetime", {
