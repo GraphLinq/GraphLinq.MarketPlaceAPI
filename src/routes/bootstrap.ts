@@ -5,6 +5,7 @@ import bodyParser = require("body-parser");
 
 import user from "./user"
 import template from "./template"
+import administration from "./administation"
 
 class Bootstrap{
 
@@ -32,6 +33,7 @@ class Bootstrap{
     private loadPaths(){
         this.server.use('/wallets',user)
         this.server.use('/templates',template)
+        this.server.use('/administrations',administration)
 
     }
 }
