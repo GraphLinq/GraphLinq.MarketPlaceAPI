@@ -7,6 +7,7 @@ import Likes from "../databases/entities/Likes"
 import Categories from "../databases/entities/Categories";
 import {validate} from "class-validator";
 import { UniqueMetadataArgs } from "typeorm/metadata-args/UniqueMetadataArgs";
+import Favorites from "../databases/entities/Favorites";
 
 
 var router = express.Router();
@@ -106,7 +107,6 @@ router.post('/',authentification,async(req,res)=>{
 
     }catch(error){
 
-        console.log(error)
         return res.status(500).send();
     }
 })
@@ -145,11 +145,11 @@ router.post('/:template_id/likes',authentification,async(req,res)=>{
         let template : Templates | undefined = await getConnection().getRepository(Templates)
                                                                     .findOne({id : Number(req.params.template_id)})
 
-        let targetTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+        let targetLike : Likes | undefined = await getConnection().getRepository(Likes)
                                                                             .findOne({template : template,
                                                                                       user_id : user.id})
         // there has not yet been a like in the template                                                                       
-        if(targetTemplate == undefined){
+        if(targetLike == undefined){
             await getConnection().getRepository(Likes).save({
                 user_id : user.id,
                 template : template
@@ -178,12 +178,12 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
         let template : Templates | undefined = await getConnection().getRepository(Templates)
         .findOne({id : Number(req.params.template_id)})
 
-        let targetTemplate : Likes | undefined = await getConnection().getRepository(Likes)
+        let targetLike : Likes | undefined = await getConnection().getRepository(Likes)
                                                                             .findOne({template : template,
                                                                                       user_id : user.id})
         // there has been a like in the template                                                                       
-        if(targetTemplate != undefined){
-            await getConnection().getRepository(Likes).remove(targetTemplate)
+        if(targetLike != undefined){
+            await getConnection().getRepository(Likes).remove(targetLike)
 
             return res.send({success : true})
         }else{
@@ -197,4 +197,66 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
     
 })
 
+
+router.post('/:template_id/favorites',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined = await getConnection().getRepository(Templates)
+                                                                    .findOne({id : Number(req.params.template_id)})
+
+        let targetFavorite : Favorites | undefined = await getConnection().getRepository(Favorites)
+                                                                            .findOne({user : user,
+                                                                                      template_id : Number(req.params.template_id)})
+        // there has not yet been a like in the template                                                                       
+        if(targetFavorite == undefined){
+            await getConnection().getRepository(Favorites).save({
+                user : user,
+                template_id : Number(req.params.template_id)
+            })
+
+            return res.send({success : true})
+        }else{
+            return res.send({success : false})
+        }
+
+    }catch (error){
+
+      return res.status(500).send();
+    }
+    
+})
+
+
+router.delete('/:template_id/favorites',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined = await getConnection().getRepository(Templates)
+                                                                    .findOne({id : Number(req.params.template_id)})
+
+        let targetFavorite : Favorites | undefined = await getConnection().getRepository(Favorites)
+                                                                            .findOne({user : user,
+                                                                                      template_id : Number(req.params.template_id)})
+        // there has not yet been a like in the template                                                                       
+        if(targetFavorite != undefined){
+            await getConnection().getRepository(Favorites).remove(targetFavorite)
+
+            return res.send({success : true})
+        }else{
+            return res.send({success : false})
+        }
+
+    }catch (error){
+
+      return res.status(500).send();
+    }
+    
+})
 export default router;
