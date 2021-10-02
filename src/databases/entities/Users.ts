@@ -35,6 +35,9 @@ export default class Users {
   @OneToMany(type => Templates, template => template.user )
   publishedTemplates : Templates[]
 
+  @OneToMany(type => Templates, template => template.user )
+  favoritesTemplates : Templates[]
+
   @Column("simple-array",{name : "purchased_templates" , nullable: true ,select: false})
   purchasedTemplates : number[]
   

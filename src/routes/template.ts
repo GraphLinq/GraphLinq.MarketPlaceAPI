@@ -209,13 +209,13 @@ router.post('/:template_id/favorites',authentification,async(req,res)=>{
                                                                     .findOne({id : Number(req.params.template_id)})
 
         let targetFavorite : Favorites | undefined = await getConnection().getRepository(Favorites)
-                                                                            .findOne({user : user,
-                                                                                      template_id : Number(req.params.template_id)})
+                                                                            .findOne({user_id : user.id,
+                                                                                      template : template})
         // there has not yet been a like in the template                                                                       
         if(targetFavorite == undefined){
             await getConnection().getRepository(Favorites).save({
-                user : user,
-                template_id : Number(req.params.template_id)
+                user_id : user.id,
+                template : template
             })
 
             return res.send({success : true})
@@ -242,8 +242,8 @@ router.delete('/:template_id/favorites',authentification,async(req,res)=>{
                                                                     .findOne({id : Number(req.params.template_id)})
 
         let targetFavorite : Favorites | undefined = await getConnection().getRepository(Favorites)
-                                                                            .findOne({user : user,
-                                                                                      template_id : Number(req.params.template_id)})
+                                                                            .findOne({user_id : user.id,
+                                                                                      template : template})
         // there has not yet been a like in the template                                                                       
         if(targetFavorite != undefined){
             await getConnection().getRepository(Favorites).remove(targetFavorite)

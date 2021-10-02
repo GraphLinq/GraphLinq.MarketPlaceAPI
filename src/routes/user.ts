@@ -7,6 +7,7 @@ import env from "../interfaces/env"
 import Users from "../databases/entities/Users" 
 import authentification from "../middlewares/authentification";
 import Templates from "../databases/entities/Templates";
+import Favorites from "../databases/entities/Favorites";
 
 var router = express.Router();
 
@@ -110,6 +111,7 @@ router.get('/:user_id/templates/published',async(req,res) => {
   
 })
 
+// todo : update after create buy system
 router.get('/:user_id/templates/purchased',async(req,res) => {
 
   try{
@@ -135,5 +137,35 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
   }
   
 })
+
+router.get('/:user_id/templates/favorites',async(req,res) => {
+
+  try{
+      let user_id : number | undefined = Number(req.params.user_id)
+      let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
+
+      if(user == undefined){
+        return res.status(500).send()
+      }else{
+
+        var templatesFavorites = await getConnection()
+        .getRepository(Favorites)
+        .createQueryBuilder("favorite")
+        .where("favorite.user_id = :id",{id : user.id})
+        .leftJoinAndSelect("favorite.template", "template")
+        .getMany();
+  
+        return res.send({
+          templates : templatesFavorites
+        })
+      }
+
+  }catch (error){
+
+    return res.status(500).send();
+  }
+  
+})
+
 
 export default router;
