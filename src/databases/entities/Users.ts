@@ -19,6 +19,8 @@ export default class Users {
   })
   @Column("varchar",{name : "name",nullable : true,length : 255})
   name : string | null
+  
+
 
   @Column("varchar",{name : "email",nullable : true,length : 255})
   email : string | null
@@ -41,6 +43,9 @@ export default class Users {
   @Column("simple-array",{name : "purchased_templates" , nullable: true ,select: false})
   purchasedTemplates : number[]
   
+
+  @Column("bool",{name : "is_admin",default : false})
+  is_admin : boolean 
 
   @Column("datetime", {
     name: "created_at",

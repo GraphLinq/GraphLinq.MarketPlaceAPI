@@ -7,7 +7,7 @@ export default class Likes {
   @PrimaryGeneratedColumn()
   id: number
 
-  @ManyToOne(type => Templates )
+  @ManyToOne(type => Templates, { cascade: true } )
   @JoinColumn({name: 'template_id', referencedColumnName: 'id'})
   template : Templates
 
