@@ -25,7 +25,6 @@ router.delete('/templates/:template_id',[authentification,isAdmin],async(req : R
             await getConnection().getRepository(Templates).delete(template)
             await getConnection().getRepository(Likes).remove(likes)
             await getConnection().getRepository(Favorites).remove(favorites)
-
         });
 
         return res.send({success : true})

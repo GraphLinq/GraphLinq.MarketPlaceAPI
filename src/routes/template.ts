@@ -8,6 +8,7 @@ import Categories from "../databases/entities/Categories";
 import {validate} from "class-validator";
 import { UniqueMetadataArgs } from "typeorm/metadata-args/UniqueMetadataArgs";
 import Favorites from "../databases/entities/Favorites";
+import TemplatesVersion from "../databases/entities/TemplatesVersions";
 
 
 var router = express.Router();
@@ -52,6 +53,7 @@ router.get('/',async(req,res) => {
         builder = builder.leftJoinAndSelect("template.category", "category")
         builder = builder.leftJoinAndSelect("template.user", "user")
         builder = builder.leftJoinAndSelect("template.likes", "like")
+        builder = builder.leftJoinAndSelect("template.versions", "versions")
 
         var resultsQuery = await builder.getMany()
         res.send({
@@ -81,10 +83,12 @@ router.post('/',authentification,async(req,res)=>{
         template.template_cost = req.body.template_cost
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
-        template.execution_cost =  "0" // todo : get the cost with api
-        template.current_version =  "0" // todo : incoming version system
-        template.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
-
+        var first_version = new TemplatesVersion
+        first_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+        first_version.current_version = "1.0.0"
+        first_version.execution_cost =  0.0 // todo : get the cost with api
+        first_version.template = template
+        template.versions = [first_version]
         const errors = await validate(template)
 
         if(errors.length > 0){
@@ -101,12 +105,60 @@ router.post('/',authentification,async(req,res)=>{
 
         }else{
 
+          //we insert the version request with the cascade system
           await getConnection().getRepository(Templates).save(template)
           return res.send({success : true})
         }
 
     }catch(error){
 
+        return res.status(500).send();
+    }
+})
+
+router.post('/:template_id/versions',authentification,async(req,res)=>{
+
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+    try{
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined =  await getConnection().getRepository(Templates)
+        .createQueryBuilder('template')
+        .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
+        .leftJoinAndSelect("template.user", "user")
+        .getOne()
+
+        if(template.user.id != user.id){
+            return res.status(500).send();
+        }
+
+        var new_version = new TemplatesVersion
+        new_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+        new_version.current_version = req.body.current_version 
+        new_version.execution_cost =  0.0 // todo : get the cost with api
+        new_version.template = template
+        const errors = await validate(new_version)
+
+        if(errors.length > 0){
+
+          return res.send({
+            success : false,
+            "errors" : errors.map(x =>  
+             ({
+                name : x.property,
+                messages  : x.constraints
+              })
+            )
+          })
+
+        }else{
+
+          await getConnection().getRepository(TemplatesVersion).save(new_version)
+          return res.send({success : true})
+        }
+
+    }catch(error){
+        console.log(error)
         return res.status(500).send();
     }
 })
@@ -122,6 +174,7 @@ router.get('/names/:name',async(req,res)=>{
         builder = builder.leftJoinAndSelect("template.category", "category")
         builder = builder.leftJoinAndSelect("template.user", "user")
         builder = builder.leftJoinAndSelect("template.likes", "like")
+        builder = builder.leftJoinAndSelect("template.versions", "versions")
 
         var resultsQuery = await builder.getMany()
         res.send({

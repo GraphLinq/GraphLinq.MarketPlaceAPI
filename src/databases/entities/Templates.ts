@@ -9,6 +9,7 @@ import {
 import Categories from "./Categories";
 import Users from "./Users";
 import Likes from "./Likes";
+import TemplatesVersion from "./TemplatesVersions";
 
 @Entity("market_templates", { schema: "graphlinq" })
 export default class Templates {
@@ -45,22 +46,14 @@ export default class Templates {
   @IsInt({
     message : 'The price of the template is not integer'
   })
+  
   @Column("int")
   template_cost : string
 
-  @Column("decimal")
-  execution_cost : string
-
-  @Column("decimal")
-  current_version : string
-  
-  @Column("text",{
-    name: "raw_bytes",
-    nullable: true,
-    select: false
+  @OneToMany(type => TemplatesVersion, template => template.template,{
+    cascade: true,
   })
-
-  raw_bytes : string
+  versions : TemplatesVersion[]
 
   @Column("datetime", {
     name: "created_at",
