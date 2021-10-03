@@ -63,7 +63,6 @@ router.get('/',async(req,res) => {
 
     }catch (error)
     {
-      console.log(error)
       return res.status(500).send();
     }
     
@@ -158,7 +157,6 @@ router.post('/:template_id/versions',authentification,async(req,res)=>{
         }
 
     }catch(error){
-        console.log(error)
         return res.status(500).send();
     }
 })
@@ -311,5 +309,28 @@ router.delete('/:template_id/favorites',authentification,async(req,res)=>{
       return res.status(500).send();
     }
     
+})
+
+
+router.get('/:template_id/:version/download',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template  : Templates | undefined = await getConnection().getRepository(Templates).findOne({id : Number(req.params.template_id)})
+        let hasBuy = true //user.purchasedTemplates todo : update later, check if the user has bought the template
+        
+        // check if the version exist
+        let templateVersion  : TemplatesVersion | undefined =  template.versions.
+                                                               find(x=> x.current_version == req.params.version.toString())
+        if(templateVersion == undefined){
+            return res.status(500).send();  
+        }else{
+            // download file todo : https://stackoverflow.com/questions/21950049/create-a-text-file-in-node-js-from-a-string-and-stream-it-in-response
+        }
+    }catch(error){
+        return res.status(500).send();  
+    }
 })
 export default router;
