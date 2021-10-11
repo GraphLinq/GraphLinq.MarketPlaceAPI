@@ -333,4 +333,119 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
         return res.status(500).send();  
     }
 })
+
+router.get('/:template_id/edit',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined =  await getConnection().getRepository(Templates)
+        .createQueryBuilder('template')
+        .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
+        .leftJoinAndSelect("template.user", "user")
+        .getOne()
+
+        if(template.user.id == user.id){
+            var builder = await getConnection().getRepository(Templates)
+            .createQueryBuilder("template")
+            .where("template.id =  :id", { id : template.id });
+
+            builder = builder.leftJoinAndSelect("template.category", "category")
+            builder = builder.leftJoinAndSelect("template.user", "user")
+            builder = builder.leftJoinAndSelect("template.likes", "like")
+            builder = builder.leftJoinAndSelect("template.versions", "versions")
+
+            var resultsQuery = await builder.getMany()
+            res.send({
+                success : true,
+                results : resultsQuery
+            }) 
+        }else{
+            return res.status(500).send();    
+        }
+  
+    }catch(error){
+        return res.status(500).send();  
+    }
+})
+
+router.put('/:template_id/edit',authentification,async(req,res)=>{
+    const authentification : any = (req as any).authentification
+    var address: string  = String(authentification.address)
+
+    try{
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let template : Templates | undefined =  await getConnection().getRepository(Templates)
+        .createQueryBuilder('template')
+        .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
+        .leftJoinAndSelect("template.user", "user")
+        .leftJoinAndSelect("template.versions", "versions")
+        .leftJoinAndSelect("template.category", "category")
+        .getOne()
+
+        if(template.user.id == user.id){
+          
+            template.name = req.body.name
+            template.description = req.body.description
+            template.template_cost = req.body.template_cost
+            template.user = user
+            template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
+            var first_version = new TemplatesVersion
+            first_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+            first_version.current_version = "1.0.0"
+            first_version.execution_cost =  0.0 // todo : get the cost with api
+            first_version.template = template
+            template.versions = [first_version]
+
+    
+            const errors = await validate(template)
+
+            if(errors.length > 0){
+
+                return res.send({
+                    success : false,
+                    "errors" : errors.map(x =>  
+                    ({
+                        name : x.property,
+                        messages  : x.constraints
+                    })
+                    )
+                })
+
+            }else{
+                var template_version = template.versions.find( x => x.id == Number(req.body.version_id))
+                template_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+                template_version.execution_cost =  0.0 // todo : get the cost with api
+                
+                const errors = await validate(template_version)
+                if(errors.length > 0){
+
+                    return res.send({
+                        success : false,
+                        "errors" : errors.map(x =>  
+                        ({
+                            name : x.property,
+                            messages  : x.constraints
+                        })
+                        )
+                    })
+    
+                }else{
+
+                    await getConnection().getRepository(TemplatesVersion).save(template_version)
+                    await getConnection().getRepository(Templates).save(template)
+                    return res.send({success : true})
+                }                
+            }
+
+        }else{
+            return res.status(500).send();    
+        }
+  
+    }catch(error){
+        return res.status(500).send();  
+    }
+})
+
 export default router;
