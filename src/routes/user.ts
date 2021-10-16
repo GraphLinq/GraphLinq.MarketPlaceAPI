@@ -46,7 +46,7 @@ router.post('/auth',async(req,res) => {
 router.put('/:user_id/profile/',authentification,async(req,res) => {
 
       const authentification : any = (req as any).authentification
-      var address: string  = String(authentification.address)
+      var address: string  = String(authentification.addr)
 
       try{
 
@@ -169,7 +169,7 @@ router.get('/:user_id/templates/favorites',async(req,res) => {
 
 router.get('/:user_id/templates/:template_id',authentification,async(req,res)=>{
   const authentification : any = (req as any).authentification
-  var address: string  = String(authentification.address)
+  var address: string  = String(authentification.addr)
 
   try{
       let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})

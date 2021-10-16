@@ -71,7 +71,8 @@ router.get('/',async(req,res) => {
 router.post('/',authentification,async(req,res)=>{
 
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
+
     try{
         let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
 
@@ -89,8 +90,8 @@ router.post('/',authentification,async(req,res)=>{
         first_version.execution_cost =  0.0 // todo : get the cost with api
         first_version.template = template
         template.versions = [first_version]
-        const errors = await validate(template)
 
+        const errors = await validate(template)
         if(errors.length > 0){
 
           return res.send({
@@ -104,7 +105,6 @@ router.post('/',authentification,async(req,res)=>{
           })
 
         }else{
-
           //we insert the version request with the cascade system
           await getConnection().getRepository(Templates).save(template)
           return res.send({success : true})
@@ -119,7 +119,7 @@ router.post('/',authentification,async(req,res)=>{
 router.post('/:template_id/versions',authentification,async(req,res)=>{
 
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
     try{
         let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
         let template : Templates | undefined =  await getConnection().getRepository(Templates)
@@ -189,7 +189,7 @@ router.get('/names/:name',async(req,res)=>{
 
 router.post('/:template_id/likes',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
 
@@ -222,7 +222,7 @@ router.post('/:template_id/likes',authentification,async(req,res)=>{
 
 router.delete('/:template_id/likes',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
 
@@ -252,7 +252,7 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
 
 router.post('/:template_id/favorites',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
 
@@ -285,7 +285,7 @@ router.post('/:template_id/favorites',authentification,async(req,res)=>{
 
 router.delete('/:template_id/favorites',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
 
@@ -315,7 +315,7 @@ router.delete('/:template_id/favorites',authentification,async(req,res)=>{
 
 router.get('/:template_id/:version/download',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
         let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
@@ -337,7 +337,7 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
 
 router.put('/:template_id/edit',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
+    var address: string  = String(authentification.addr)
 
     try{
         let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
