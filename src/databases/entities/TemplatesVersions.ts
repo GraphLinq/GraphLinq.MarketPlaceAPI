@@ -42,7 +42,6 @@ export default class TemplatesVersion {
     name: "created_at",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
-    select: false
   })  
   createdAt: Date;
 
@@ -50,7 +49,6 @@ export default class TemplatesVersion {
     name: "updated_at",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
-    select: false
   })
   updatedAt: Date;
 }
