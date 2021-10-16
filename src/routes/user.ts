@@ -43,6 +43,26 @@ router.post('/auth',async(req,res) => {
       }
 })
 
+router.get('/:user_id',async(req,res) => {
+  try{
+
+    let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: Number(req.params.user_id)})
+
+    if(user == undefined){
+       return res.status(500).send();
+    }else{
+      res.send({
+        name : user.name,
+        email : user.email,
+      })
+    }
+
+  }catch (error){
+
+    return res.status(500).send();
+  }
+})
+
 router.put('/:user_id/profile/',authentification,async(req,res) => {
 
       const authentification : any = (req as any).authentification
