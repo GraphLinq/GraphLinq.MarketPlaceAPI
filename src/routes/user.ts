@@ -189,13 +189,9 @@ router.get('/:user_id/templates/favorites',async(req,res) => {
   
 })
 
-router.get('/:user_id/templates/:template_id',authentification,async(req,res)=>{
-
-  const authentification : any = (req as any).authentification
-  var address: string  = String(authentification.addr)
+router.get('/:user_id/templates/:template_id',async(req,res)=>{
 
   try{
-      let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
 
       let template : Templates | undefined =  await getConnection().getRepository(Templates)
       .createQueryBuilder('template')
@@ -203,7 +199,7 @@ router.get('/:user_id/templates/:template_id',authentification,async(req,res)=>{
       .leftJoinAndSelect("template.user", "user")
       .getOne()
 
-      if(template.user.id == user.id){
+      if(template.user.id === Number(req.params.user_id)){
           var builder = await getConnection().getRepository(Templates)
           .createQueryBuilder("template")
           .where("template.id =  :id", { id : template.id });
