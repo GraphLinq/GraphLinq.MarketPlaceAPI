@@ -34,8 +34,7 @@ router.post('/auth',async(req,res) => {
         const token = jwt.sign({addr, id_wallet: user.id}, env.JWT_SECRET)
         user.token = token
         await getConnection().getRepository(Users).save(user)
-        res.send({auth: true, token});
-        
+        res.send({auth: true, token,id : user.id});        
       }
       catch (error)
       {
