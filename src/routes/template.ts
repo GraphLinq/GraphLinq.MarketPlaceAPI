@@ -79,7 +79,8 @@ router.post('/',authentification,async(req,res)=>{
         let template = new Templates()
         template.name = req.body.name
         template.description = req.body.description
-        template.template_cost = req.body.template_cost
+        template.template_cost = req.body.price
+        template.youtube = req.body.youtube
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
         var first_version = new TemplatesVersion
@@ -329,42 +330,6 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
         }else{
             // download file todo : https://stackoverflow.com/questions/21950049/create-a-text-file-in-node-js-from-a-string-and-stream-it-in-response
         }
-    }catch(error){
-        return res.status(500).send();  
-    }
-})
-
-router.get('/:template_id/edit',authentification,async(req,res)=>{
-    const authentification : any = (req as any).authentification
-    var address: string  = String(authentification.address)
-
-    try{
-        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
-        let template : Templates | undefined =  await getConnection().getRepository(Templates)
-        .createQueryBuilder('template')
-        .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
-        .leftJoinAndSelect("template.user", "user")
-        .getOne()
-
-        if(template.user.id == user.id){
-            var builder = await getConnection().getRepository(Templates)
-            .createQueryBuilder("template")
-            .where("template.id =  :id", { id : template.id });
-
-            builder = builder.leftJoinAndSelect("template.category", "category")
-            builder = builder.leftJoinAndSelect("template.user", "user")
-            builder = builder.leftJoinAndSelect("template.likes", "like")
-            builder = builder.leftJoinAndSelect("template.versions", "versions")
-
-            var resultsQuery = await builder.getMany()
-            res.send({
-                success : true,
-                results : resultsQuery
-            }) 
-        }else{
-            return res.status(500).send();    
-        }
-  
     }catch(error){
         return res.status(500).send();  
     }

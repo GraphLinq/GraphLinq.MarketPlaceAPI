@@ -15,23 +15,23 @@ router.post('/auth',async(req,res) => {
     try {
 
         const web3 = new Web3(new Web3.providers.HttpProvider(env.ETH_NODE))
-        const address = web3.eth.accounts.recover(env.AUTH_SIGNATURE, req.body.signature);
-        if (address !== req.body.address) {
+        const addr = web3.eth.accounts.recover(env.AUTH_SIGNATURE, req.body.signature);
+        if (addr !== req.body.address) {
           return res.status(400).send({auth: false})
         }
     
-        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: addr})
         
         if (user === undefined) {
 
           user = getConnection().getRepository(Users).create({
-            publicAddress:  address,
+            publicAddress:  addr,
           })
 
           await getConnection().getRepository(Users).save(user)
         }
 
-        const token = jwt.sign({address, user_id: user.id}, env.JWT_SECRET)
+        const token = jwt.sign({addr, id_wallet: user.id}, env.JWT_SECRET)
         user.token = token
         await getConnection().getRepository(Users).save(user)
         res.send({auth: true, token});
@@ -165,6 +165,42 @@ router.get('/:user_id/templates/favorites',async(req,res) => {
     return res.status(500).send();
   }
   
+})
+
+router.get('/:user_id/templates/:template_id',authentification,async(req,res)=>{
+  const authentification : any = (req as any).authentification
+  var address: string  = String(authentification.address)
+
+  try{
+      let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
+      let template : Templates | undefined =  await getConnection().getRepository(Templates)
+      .createQueryBuilder('template')
+      .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
+      .leftJoinAndSelect("template.user", "user")
+      .getOne()
+
+      if(template.user.id == user.id){
+          var builder = await getConnection().getRepository(Templates)
+          .createQueryBuilder("template")
+          .where("template.id =  :id", { id : template.id });
+
+          builder = builder.leftJoinAndSelect("template.category", "category")
+          builder = builder.leftJoinAndSelect("template.user", "user")
+          builder = builder.leftJoinAndSelect("template.likes", "like")
+          builder = builder.leftJoinAndSelect("template.versions", "versions")
+
+          var resultsQuery = await builder.getMany()
+          res.send({
+              success : true,
+              results : resultsQuery
+          }) 
+      }else{
+          return res.status(500).send();    
+      }
+
+  }catch(error){
+      return res.status(500).send();  
+  }
 })
 
 

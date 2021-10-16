@@ -32,6 +32,10 @@ export default class Templates {
   @Column("text")
   description : string | null
 
+  @Column("text")
+  youtube : string | null
+
+
   @ManyToOne(type => Users)
   @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
   user : Users

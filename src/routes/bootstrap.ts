@@ -31,7 +31,7 @@ class Bootstrap{
     }
 
     private loadPaths(){
-        this.server.use('/wallets',user)
+        this.server.use('/users',user)
         this.server.use('/templates',template)
         this.server.use('/administrations',administration)
 
