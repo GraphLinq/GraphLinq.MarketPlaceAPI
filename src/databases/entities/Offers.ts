@@ -4,15 +4,16 @@ import {
   MaxLength,
   MinLength,
   IsDecimal,
-  IsInt
+  IsInt,
+  IsEmail
 } from 'class-validator';
 import Categories from "./Categories";
 import Users from "./Users";
 import Likes from "./Likes";
 import TemplatesVersion from "./TemplatesVersions";
 
-@Entity("market_templates", { schema: "graphlinq" })
-export default class Templates {
+//@Entity("offer_templates", { schema: "graphlinq" })
+export default class Offer {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -23,7 +24,7 @@ export default class Templates {
     message : 'Name is to big'
   })
   @Column("varchar")
-  name : string | null
+  title : string | null
 
 
   @MinLength(10,{
@@ -32,32 +33,23 @@ export default class Templates {
   @Column("text")
   description : string | null
 
+  
   @Column("text")
-  youtube : string | null
-
+  email : string | null
 
   @ManyToOne(type => Users)
   @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
   user : Users
 
-  @ManyToOne(type => Categories )
-  @JoinColumn({name: 'category_id', referencedColumnName: 'id'})
-  category : Categories
-
-  @OneToMany(type => Likes, like => like.template)
-  likes : Likes[]
 
   @IsInt({
     message : 'The price of the template is not integer'
   })
   
   @Column("int")
-  template_cost : string
+  budget : string
 
-  @OneToMany(type => TemplatesVersion, template => template.template,{
-    cascade: true,
-  })
-  versions : TemplatesVersion[]
+
 
   @Column("datetime", {
     name: "created_at",

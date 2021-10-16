@@ -408,4 +408,30 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
     }
 })
 
+router.get('/:template_id',async(req,res)=>{
+
+    try{
+  
+        var builder = await getConnection().getRepository(Templates)
+        .createQueryBuilder("template")
+        .where("template.id =  :id", { id : Number(req.params.template_id) });
+
+        builder = builder.leftJoinAndSelect("template.category", "category")
+        builder = builder.leftJoinAndSelect("template.user", "user")
+        builder = builder.leftJoinAndSelect("template.likes", "like")
+        builder = builder.leftJoinAndSelect("template.versions", "versions")
+
+        var resultsQuery = await builder.getOne()
+        res.send({
+            success : true,
+            results : resultsQuery
+        }) 
+
+  
+    }catch(error){
+        return res.status(500).send();  
+    }
+  })
+  
+
 export default router;
