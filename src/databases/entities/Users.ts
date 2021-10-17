@@ -26,7 +26,7 @@ export default class Users {
   @Column("varchar",{name : "publisher_name",nullable : true,length : 255})
   publisherName : string | null
 
-  @Column("varchar",{name : "public_address",nullable : true,length : 255,select: false})
+  @Column("varchar",{name : "public_address",nullable : true,length : 255})
   publicAddress : string | null
 
   @Column("varchar",{name : "token",nullable : true,length : 255,select: false})
