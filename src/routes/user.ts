@@ -118,6 +118,7 @@ router.get('/:user_id/templates/published',async(req,res) => {
       .leftJoinAndSelect("template.category", "category")
       .leftJoinAndSelect("template.likes", "like")
       .leftJoinAndSelect("template.versions", "versions")
+      .where("template.user_id = :id",{id : user_id})
 
       .getOne();
 
