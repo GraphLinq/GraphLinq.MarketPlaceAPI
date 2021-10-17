@@ -54,6 +54,7 @@ router.get('/:user_id',async(req,res) => {
       res.send({
         name : user.name,
         email : user.email,
+        id : user.publicAddress
       })
     }
 
