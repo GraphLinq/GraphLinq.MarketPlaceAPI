@@ -114,6 +114,10 @@ router.get('/:user_id/templates/published',async(req,res) => {
       .getRepository(Users)
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.publishedTemplates", "template")
+      .leftJoinAndSelect("template.category", "category")
+      .leftJoinAndSelect("template.likes", "like")
+      .leftJoinAndSelect("template.versions", "versions")
+
       .getOne();
 
       if(user == undefined){
@@ -122,12 +126,12 @@ router.get('/:user_id/templates/published',async(req,res) => {
 
 
         return res.send({
-          templates :  user.publishedTemplates
+          templates :  user
         })
       }
       
   }catch (error){
-
+    console.log(error)
     return res.status(500).send();
   }
   
