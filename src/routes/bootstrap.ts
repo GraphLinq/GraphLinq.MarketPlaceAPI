@@ -6,6 +6,7 @@ import bodyParser = require("body-parser");
 import user from "./user"
 import template from "./template"
 import administration from "./administation"
+import offer from "./offer"
 
 class Bootstrap{
 
@@ -34,6 +35,7 @@ class Bootstrap{
         this.server.use('/users',user)
         this.server.use('/templates',template)
         this.server.use('/administrations',administration)
+        this.server.use('/offers',offer)
 
     }
 }

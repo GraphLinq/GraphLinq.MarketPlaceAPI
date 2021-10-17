@@ -7,13 +7,11 @@ import {
   IsInt,
   IsEmail
 } from 'class-validator';
-import Categories from "./Categories";
 import Users from "./Users";
-import Likes from "./Likes";
-import TemplatesVersion from "./TemplatesVersions";
 
-//@Entity("offer_templates", { schema: "graphlinq" })
-export default class Offer {
+
+@Entity("offer_templates", { schema: "graphlinq" })
+export default class Offers {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -37,10 +35,6 @@ export default class Offer {
   @Column("text")
   email : string | null
 
-  @ManyToOne(type => Users)
-  @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
-  user : Users
-
 
   @IsInt({
     message : 'The price of the template is not integer'
@@ -49,7 +43,9 @@ export default class Offer {
   @Column("int")
   budget : string
 
-
+  @ManyToOne(type => Users)
+  @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
+  user : Users
 
   @Column("datetime", {
     name: "created_at",
@@ -66,4 +62,6 @@ export default class Offer {
     select: false
   })
   updatedAt: Date;
+
+
 }
