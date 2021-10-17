@@ -85,4 +85,33 @@ router.get('/',async(req,res) => {
     
 })
 
+
+
+router.get('/:offer_id',async(req,res) => {
+
+    try{
+        let offer_id:number | undefined=  Number(req.params.offer_id)
+
+    
+        var builder = await getConnection().getRepository(Offers)
+        .createQueryBuilder('offer')
+        .where("offer.id = :id",{id : offer_id})
+
+
+        
+        builder = builder.leftJoinAndSelect("offer.user", "user")
+
+        var resultsQuery = await builder.getOne()
+        res.send({
+            success : true,
+            results : resultsQuery
+        })
+
+    }catch (error)
+    {
+      console.log(error)
+      return res.status(500).send();
+    }
+    
+})
 export default router;
