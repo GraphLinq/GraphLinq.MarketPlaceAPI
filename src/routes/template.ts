@@ -107,7 +107,7 @@ router.post('/',authentification,async(req,res)=>{
         }else{
           //we insert the version request with the cascade system
           await getConnection().getRepository(Templates).save(template)
-          return res.send({success : true})
+          return res.send({success : true, templateId : template.id})
         }
 
     }catch(error){
