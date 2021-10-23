@@ -38,8 +38,8 @@ export default class Users {
   @OneToMany(type => Templates, template => template.user )
   favoritesTemplates : Templates[]
 
-  @Column("simple-array",{name : "purchased_templates" , nullable: true ,select: false})
-  purchasedTemplates : number[]
+  @OneToMany(type => Templates, template => template.user )
+  purchasedTemplates : Templates[]
   
 
   @Column("bool",{name : "is_admin",default : false})

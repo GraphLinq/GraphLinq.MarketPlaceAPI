@@ -1,5 +1,5 @@
 import express = require("express");
-import { getConnection } from "typeorm";
+import { getConnection, SimpleConsoleLogger } from "typeorm";
 import Templates from "../databases/entities/Templates" 
 import authentification from "../middlewares/authentification";
 import Users from "../databases/entities/Users" 
@@ -9,7 +9,7 @@ import {validate} from "class-validator";
 import { UniqueMetadataArgs } from "typeorm/metadata-args/UniqueMetadataArgs";
 import Favorites from "../databases/entities/Favorites";
 import TemplatesVersion from "../databases/entities/TemplatesVersions";
-
+import {marketProvider} from "../providers/forwadingContract"
 
 var router = express.Router();
 
@@ -375,7 +375,9 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
             }else{
                 var template_version = template.versions.find( x => x.id == Number(req.body.version_id))
 
-                template_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+                if(req.body.data.length > 0)
+                    template_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
+                
                 template_version.execution_cost =  0.0 // todo : get the cost with api
                 
                 const errors = await validate(template_version)
@@ -404,6 +406,7 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
         }
   
     }catch(error){
+        console.log(error)
         return res.status(500).send();  
     }
 })
@@ -433,5 +436,19 @@ router.get('/:template_id',async(req,res)=>{
     }
   })
   
-
+router.get('/test/test',authentification,async(req,res) => {
+    try{
+        console.log("aaa")
+        const authentification : any = (req as any).authentification
+        var address: string  = String(authentification.addr)
+        console.log(address)
+        const access = await marketProvider().methods.hasAccess(20,address).call()
+        console.log(access)
+        res.send()
+    }catch(error){
+        console.log(error)
+        return res.status(500).send();    
+    }
+    
+})
 export default router;
