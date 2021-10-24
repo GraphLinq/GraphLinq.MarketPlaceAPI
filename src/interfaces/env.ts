@@ -12,6 +12,8 @@ interface EnvInterface {
     DB_TYPE: string,
     DB_NAME: string,
 
+    CONTRACT_ADDRESS:string
+
     
 }
 

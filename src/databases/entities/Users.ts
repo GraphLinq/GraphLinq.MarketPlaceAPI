@@ -5,6 +5,7 @@ import {
   MinLength,
 } from 'class-validator';
 import Templates from "./Templates";
+import TemplatesPurchaseds from "./TemplatesPurchaseds";
 
 @Entity("users", { schema: "graphlinq" })
 export default class Users {
@@ -38,8 +39,8 @@ export default class Users {
   @OneToMany(type => Templates, template => template.user )
   favoritesTemplates : Templates[]
 
-  @OneToMany(type => Templates, template => template.user )
-  purchasedTemplates : Templates[]
+  @OneToMany(type => TemplatesPurchaseds, template => template.user )
+  purchasedTemplates : TemplatesPurchaseds[]
   
 
   @Column("bool",{name : "is_admin",default : false})

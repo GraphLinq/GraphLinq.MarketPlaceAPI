@@ -9,6 +9,7 @@ import authentification from "../middlewares/authentification";
 import Templates from "../databases/entities/Templates";
 import Favorites from "../databases/entities/Favorites";
 import {marketProvider} from "../providers/forwadingContract"
+import TemplatesPurchaseds from "../databases/entities/TemplatesPurchaseds";
 
 var router = express.Router();
 
@@ -127,9 +128,8 @@ router.get('/:user_id/templates/published',async(req,res) => {
         return res.status(500).send()
       }else{
 
-
         return res.send({
-          templates :  user
+          results :  user
         })
       }
       
@@ -140,24 +140,28 @@ router.get('/:user_id/templates/published',async(req,res) => {
   
 })
 
-// todo : update after create buy system
 router.get('/:user_id/templates/purchased',async(req,res) => {
 
   try{
-      let user_id : number | undefined = Number(req.params.user_id)
-      let user: Users | undefined = await getConnection().getRepository(Users).findOne({id: user_id})
+      
+      let userData: Users | undefined = await getConnection()
+      .getRepository(Users)
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.purchasedTemplates", "purchased")
+      .leftJoinAndSelect("purchased.template", "template")
+      .leftJoinAndSelect("template.category", "category")
+      .leftJoinAndSelect("template.likes", "like")
+      .leftJoinAndSelect("template.versions", "versions")
 
-      if(user == undefined){
+      .where("user.id = :id",{id : Number(req.params.user_id)})
+      .getOne();
+      console.log()
+      if(userData == undefined){
+
         return res.status(500).send()
       }else{
 
-        var templatesPurchased = Promise.all(user.purchasedTemplates.map(async x => 
-          await getConnection().getRepository(Templates).findOne({id : Number(x)})
-        ))
-  
-        return res.send({
-          templates : await templatesPurchased
-        })
+        res.send({templates : userData.purchasedTemplates.map( purchased => purchased.template)})
       }
 
   }catch (error){
@@ -240,28 +244,32 @@ router.post('/:user_id/templates/:template_id',authentification,async(req,res)=>
     const hasAccess =  await marketProvider().methods.hasAccess(templateId,address).call()
     // if the user has purchased the template
     if(hasAccess){
-      let user: Users | undefined = await getConnection()
+      let userData: Users | undefined = await getConnection()
       .getRepository(Users)
       .createQueryBuilder("user")
-      .leftJoinAndSelect("user.purchasedTemplates", "template")
-      .where("template.user_id = :id",{id : req.params.user_id})
+      .leftJoinAndSelect("user.purchasedTemplates", "purchased")
+      .leftJoinAndSelect("purchased.template", "template")
+      .where("user.id = :id",{id : Number(req.params.user_id)})
       .getOne();
       
       // if the user dont have the template
-      if(!user.purchasedTemplates.find(x => x.id == templateId)){
+      if(userData.purchasedTemplates === undefined ||  !userData.purchasedTemplates.find(x => x.template.id == templateId)){
 
         let template : Templates | undefined =  await getConnection().getRepository(Templates)
         .createQueryBuilder('template')
         .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
         .getOne()
-        user.purchasedTemplates.push(template)
+
+        const purchasedTemplate : TemplatesPurchaseds = new TemplatesPurchaseds
+        purchasedTemplate.user = userData,
+        purchasedTemplate.template =  template
+        await getConnection().getRepository(TemplatesPurchaseds).save(purchasedTemplate)
+
         return res.send();   
       }else{
-        console.log("a")
         return res.status(500).send();   
       }
     }else{
-      console.log("b")
       return res.status(500).send();   
     }
 
@@ -269,8 +277,6 @@ router.post('/:user_id/templates/:template_id',authentification,async(req,res)=>
   }catch(error){
     return res.status(500).send();  
   }
-
-
 })
 
 export default router;

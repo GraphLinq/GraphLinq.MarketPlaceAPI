@@ -10,6 +10,7 @@ import Categories from "./Categories";
 import Users from "./Users";
 import Likes from "./Likes";
 import TemplatesVersion from "./TemplatesVersions";
+import TemplatesPurchaseds from "./TemplatesPurchaseds";
 
 @Entity("market_templates", { schema: "graphlinq" })
 export default class Templates {
@@ -59,6 +60,9 @@ export default class Templates {
   })
   versions : TemplatesVersion[]
 
+  @OneToMany(type => TemplatesPurchaseds, purchased => purchased.template )
+  purchasedTemplates : TemplatesPurchaseds[]
+  
   @Column("datetime", {
     name: "created_at",
     nullable: true,

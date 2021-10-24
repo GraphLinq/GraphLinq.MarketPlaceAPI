@@ -316,20 +316,43 @@ router.delete('/:template_id/favorites',authentification,async(req,res)=>{
 router.get('/:template_id/:version/download',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
     var address: string  = String(authentification.addr)
-
     try{
-        let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: address})
-        let template  : Templates | undefined = await getConnection().getRepository(Templates).findOne({id : Number(req.params.template_id)})
-        let hasBuy = true //user.purchasedTemplates todo : update later, check if the user has bought the template
         
-        // check if the version exist
-        let templateVersion  : TemplatesVersion | undefined =  template.versions.
-                                                               find(x=> x.current_version == req.params.version.toString())
-        if(templateVersion == undefined){
-            return res.status(500).send();  
+        let template: Templates | undefined = await getConnection()
+        .getRepository(Templates)
+        .createQueryBuilder("template")
+        .leftJoinAndSelect("template.versions", "versions")
+        .addSelect('versions.raw_bytes')
+        .where("template.id = :id",{id : Number(req.params.template_id)})
+        .getOne();
+
+        let userData: Users | undefined = await getConnection()
+        .getRepository(Users)
+        .createQueryBuilder("user")
+        .where("user.publicAddress = :publicAddress",{publicAddress : address})
+        .leftJoinAndSelect("user.purchasedTemplates", "purchased")
+        .leftJoinAndSelect("purchased.template", "template")
+        .getOne();
+
+        // the user has not bought the template
+        if(userData.purchasedTemplates === undefined || 
+                !userData.purchasedTemplates.find(purchased  => purchased.template.id ===  Number(req.params.template_id))){
+                return res.status(500).send();  
         }else{
-            // download file todo : https://stackoverflow.com/questions/21950049/create-a-text-file-in-node-js-from-a-string-and-stream-it-in-response
+
+            let templateVersion  : TemplatesVersion | undefined =  template.versions.
+                                    find(x=> x.id == Number(req.params.version))
+            
+            if(templateVersion == undefined){
+                return res.status(500).send({success : false});  
+            }else{
+                res.send({
+                    success : true,
+                    results : templateVersion.raw_bytes
+                })
+            }
         }
+        
     }catch(error){
         return res.status(500).send();  
     }
@@ -436,19 +459,4 @@ router.get('/:template_id',async(req,res)=>{
     }
   })
   
-router.get('/test/test',authentification,async(req,res) => {
-    try{
-        console.log("aaa")
-        const authentification : any = (req as any).authentification
-        var address: string  = String(authentification.addr)
-        console.log(address)
-        const access = await marketProvider().methods.hasAccess(20,address).call()
-        console.log(access)
-        res.send()
-    }catch(error){
-        console.log(error)
-        return res.status(500).send();    
-    }
-    
-})
 export default router;
