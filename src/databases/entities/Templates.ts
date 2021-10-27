@@ -11,6 +11,7 @@ import Users from "./Users";
 import Likes from "./Likes";
 import TemplatesVersion from "./TemplatesVersions";
 import TemplatesPurchaseds from "./TemplatesPurchaseds";
+import TemplatesAssets from "./TemplatesAssets";
 
 @Entity("market_templates", { schema: "graphlinq" })
 export default class Templates {
@@ -44,6 +45,11 @@ export default class Templates {
   @ManyToOne(type => Categories )
   @JoinColumn({name: 'category_id', referencedColumnName: 'id'})
   category : Categories
+
+  @OneToMany(type => TemplatesAssets, asset => asset.template,{
+    cascade: true,
+  })
+  assets : TemplatesAssets[]
 
   @OneToMany(type => Likes, like => like.template)
   likes : Likes[]

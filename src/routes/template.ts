@@ -10,6 +10,7 @@ import { UniqueMetadataArgs } from "typeorm/metadata-args/UniqueMetadataArgs";
 import Favorites from "../databases/entities/Favorites";
 import TemplatesVersion from "../databases/entities/TemplatesVersions";
 import {marketProvider} from "../providers/forwadingContract"
+import TemplatesAssets from "../databases/entities/TemplatesAssets";
 
 var router = express.Router();
 
@@ -84,6 +85,14 @@ router.post('/',authentification,async(req,res)=>{
         template.youtube = req.body.youtube
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
+        var assets: TemplatesAssets[] = []
+        req.body.assets.forEach((value: { type: string;data:string }) => {
+            var asset:TemplatesAssets = new  TemplatesAssets 
+            asset.type = value.type
+            asset.data = value.data
+            assets.push(asset)
+        });
+        template.assets = assets
         var first_version = new TemplatesVersion
         first_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
         first_version.current_version = "1.0.0"
@@ -446,6 +455,7 @@ router.get('/:template_id',async(req,res)=>{
         builder = builder.leftJoinAndSelect("template.user", "user")
         builder = builder.leftJoinAndSelect("template.likes", "like")
         builder = builder.leftJoinAndSelect("template.versions", "versions")
+        builder = builder.leftJoinAndSelect("template.assets", "assets")
 
         var resultsQuery = await builder.getOne()
         res.send({
