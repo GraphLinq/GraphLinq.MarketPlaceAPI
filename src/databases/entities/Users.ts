@@ -21,6 +21,9 @@ export default class Users {
   @Column("varchar",{name : "name",nullable : true,length : 255})
   name : string | null
 
+  @Column("text")
+  picture : string | null
+
   @Column("varchar",{name : "email",nullable : true,length : 255})
   email : string | null
 

@@ -81,6 +81,7 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
         }
         
         user.name = req.body.name
+        user.picture = req.body.picture
         const errors = await validate(user)
 
         if(errors.length > 0){
