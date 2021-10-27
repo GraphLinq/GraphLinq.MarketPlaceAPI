@@ -398,7 +398,7 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
             }else{
                 var template_version = template.versions.find( x => x.id == Number(req.body.version_id))
 
-                if(req.body.data.length > 0)
+                if(req.body.data !== "" && req.body.data !== " ")
                     template_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
                 
                 template_version.execution_cost =  0.0 // todo : get the cost with api
