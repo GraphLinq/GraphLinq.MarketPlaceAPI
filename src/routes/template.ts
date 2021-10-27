@@ -86,10 +86,10 @@ router.post('/',authentification,async(req,res)=>{
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
         var assets: TemplatesAssets[] = []
-        req.body.assets.forEach((value: { type: string;data:string }) => {
+        req.body.images.forEach((value: string) => {
             var asset:TemplatesAssets = new  TemplatesAssets 
-            asset.type = value.type
-            asset.data = value.data
+            asset.type = "image"
+            asset.data = value
             assets.push(asset)
         });
         template.assets = assets
