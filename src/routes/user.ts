@@ -81,7 +81,9 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
            return res.status(500).send();
         }
         
-        user.name = req.body.name
+        if(req.body.name !== "" || req.body.name !== " ")
+          user.name = req.body.name
+          
         user.picture = req.body.picture
         const errors = await validate(user)
 
