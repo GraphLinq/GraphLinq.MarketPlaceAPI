@@ -122,6 +122,7 @@ router.get('/:user_id/templates/published',async(req,res) => {
       .leftJoinAndSelect("template.category", "category")
       .leftJoinAndSelect("template.likes", "like")
       .leftJoinAndSelect("template.versions", "versions")
+      .leftJoinAndSelect("template.assets", "assets")
       .where("template.user_id = :id",{id : user_id})
 
       .getOne();
@@ -130,9 +131,16 @@ router.get('/:user_id/templates/published',async(req,res) => {
         return res.status(500).send()
       }else{
 
+        user.publishedTemplates.map(template => template.assets.unshift({
+          type : "youtube",
+          data : template.youtube,
+          id : -1,
+          template : null
+        }))
+
         return res.send({
-          results :  user
-        })
+            results :  user
+          })
       }
       
   }catch (error){
@@ -157,13 +165,19 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
 
       .where("user.id = :id",{id : Number(req.params.user_id)})
       .getOne();
-      console.log()
       if(userData == undefined){
 
         return res.status(500).send()
       }else{
+        const templates = userData.purchasedTemplates.map( purchased => purchased.template)
+        templates.map(template => template.assets.unshift({
+          type : "youtube",
+          data : template.youtube,
+          id : -1,
+          template : null
+        }))
 
-        res.send({templates : userData.purchasedTemplates.map( purchased => purchased.template)})
+        res.send({templates : templates})
       }
 
   }catch (error){
