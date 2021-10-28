@@ -131,12 +131,18 @@ router.get('/:user_id/templates/published',async(req,res) => {
         return res.status(500).send()
       }else{
 
-        user.publishedTemplates.map(template => template.assets.unshift({
-          type : "youtube",
-          data : template.youtube,
-          id : -1,
-          template : null
-        }))
+        user.publishedTemplates.map(template => {
+          if(template.assets !== undefined)
+            template.assets = []
+            if(template.youtube !== ""){
+              template.assets.unshift({
+                type : "youtube",
+                data : template.youtube,
+                id : -1,
+                template : null
+              })
+          }
+      })
 
         return res.send({
             results :  user
@@ -170,12 +176,21 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
         return res.status(500).send()
       }else{
         const templates = userData.purchasedTemplates.map( purchased => purchased.template)
-        templates.map(template => template.assets.unshift({
-          type : "youtube",
-          data : template.youtube,
-          id : -1,
-          template : null
-        }))
+        
+        templates.map(template => {
+            if(template.assets !== undefined)
+              template.assets = []
+            
+            if(template.youtube !== ""){
+              template.assets.unshift({
+                type : "youtube",
+                data : template.youtube,
+                id : -1,
+                template : null
+              })
+            }
+          }
+        )
 
         res.send({templates : templates})
       }

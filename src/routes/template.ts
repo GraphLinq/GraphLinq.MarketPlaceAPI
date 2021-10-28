@@ -58,12 +58,18 @@ router.get('/',async(req,res) => {
         builder = builder.leftJoinAndSelect("template.assets", "assets")
 
         var resultsQuery = await builder.getMany()
-        resultsQuery.map(template => template.assets.unshift({
-            type : "youtube",
-            data : template.youtube,
-            id : -1,
-            template : null
-        }))
+        resultsQuery.map(template => {
+            if(template.assets !== undefined)
+              template.assets = []
+              if(template.youtube !== ""){
+                template.assets.unshift({
+                  type : "youtube",
+                  data : template.youtube,
+                  id : -1,
+                  template : null
+                })
+            }
+        })
 
         res.send({
             success : true,
@@ -194,13 +200,19 @@ router.get('/names/:name',async(req,res)=>{
         builder = builder.leftJoinAndSelect("template.assets", "assets")
 
         var resultsQuery = await builder.getMany()
-        resultsQuery.map(template => template.assets.unshift({
-            type : "youtube",
-            data : template.youtube,
-            id : -1,
-            template : null
-        }))
-        
+        resultsQuery.map(template => {
+            if(template.assets !== undefined)
+              template.assets = []
+              if(template.youtube !== ""){
+                template.assets.unshift({
+                  type : "youtube",
+                  data : template.youtube,
+                  id : -1,
+                  template : null
+                })
+            }
+        })
+
         res.send({
             success : true,
             results : resultsQuery
@@ -475,12 +487,18 @@ router.get('/:template_id',async(req,res)=>{
 
         var resultsQuery = await builder.getOne()
         
-        resultsQuery.assets.unshift({
-            type : "youtube",
-            data : resultsQuery.youtube,
-            id : -1,
-            template : null
-        })
+        
+        if(resultsQuery.assets !== undefined)
+            resultsQuery.assets = []
+            if(resultsQuery.youtube !== ""){
+                resultsQuery.assets.unshift({
+                type : "youtube",
+                data : resultsQuery.youtube,
+                id : -1,
+                template : null
+            })
+        }
+        
 
         res.send({
             success : true,
