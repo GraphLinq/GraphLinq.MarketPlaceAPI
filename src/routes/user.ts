@@ -41,6 +41,7 @@ router.post('/auth',async(req,res) => {
       }
       catch (error)
       {
+        console.log(error)
         return res.status(500).send();
       }
 })
@@ -63,6 +64,7 @@ router.get('/:user_id',async(req,res) => {
 
   }catch (error){
 
+    console.log(error)
     return res.status(500).send();
   }
 })
@@ -85,6 +87,7 @@ router.get('/addr/:user_addr',async(req,res) => {
 
   }catch (error){
 
+    console.log(error)
     return res.status(500).send();
   }
 })
@@ -128,7 +131,7 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
         }
 
       }catch (error){
-console.log(error)
+        console.log(error)
         return res.status(500).send();
       }
       
@@ -222,6 +225,7 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
 
   }catch (error){
 
+    console.log(error)
     return res.status(500).send();
   }
   
@@ -251,6 +255,7 @@ router.get('/:user_id/templates/favorites',async(req,res) => {
 
   }catch (error){
 
+    console.log(error)
     return res.status(500).send();
   }
   
@@ -286,6 +291,7 @@ router.get('/:user_id/templates/:template_id',async(req,res)=>{
       }
 
   }catch(error){
+      console.log(error)
       return res.status(500).send();  
   }
 })
@@ -331,6 +337,7 @@ router.post('/:user_id/templates/:template_id',authentification,async(req,res)=>
 
 
   }catch(error){
+    console.log(error)
     return res.status(500).send();  
   }
 })

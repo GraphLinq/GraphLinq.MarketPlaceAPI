@@ -78,6 +78,7 @@ router.get('/',async(req,res) => {
 
     }catch (error)
     {
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -134,7 +135,7 @@ router.post('/',authentification,async(req,res)=>{
         }
 
     }catch(error){
-
+        console.log(error)
         return res.status(500).send();
     }
 })
@@ -181,6 +182,7 @@ router.post('/:template_id/versions',authentification,async(req,res)=>{
         }
 
     }catch(error){
+        console.log(error)
         return res.status(500).send();
     }
 })
@@ -220,6 +222,7 @@ router.get('/names/:name',async(req,res)=>{
                    
     }catch (error)
     {
+      console.log(error)
       return res.status(500).send();
     }
 })
@@ -251,6 +254,7 @@ router.post('/:template_id/likes',authentification,async(req,res)=>{
 
     }catch (error){
 
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -281,6 +285,7 @@ router.delete('/:template_id/likes',authentification,async(req,res)=>{
 
     }catch (error){
 
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -313,7 +318,7 @@ router.post('/:template_id/favorites',authentification,async(req,res)=>{
         }
 
     }catch (error){
-
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -344,6 +349,7 @@ router.delete('/:template_id/favorites',authentification,async(req,res)=>{
 
     }catch (error){
 
+      console.log(error)
       return res.status(500).send();
     }
     
@@ -391,6 +397,7 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
         }
         
     }catch(error){
+        console.log(error)
         return res.status(500).send();  
     }
 })
@@ -507,6 +514,7 @@ router.get('/:template_id',async(req,res)=>{
 
   
     }catch(error){
+        console.log(error)
         return res.status(500).send();  
     }
   })
