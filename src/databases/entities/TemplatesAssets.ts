@@ -15,7 +15,7 @@ export default class TemplatesAssets {
   @Column("varchar",{name : "type",nullable : true,length : 255})
   type : string | null
 
-  @Column("text")
+  @Column("longtext")
   data : string | null
 
 }
