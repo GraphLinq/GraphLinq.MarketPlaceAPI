@@ -19,7 +19,7 @@ export default class Users {
   @Column("varchar",{name : "name",nullable : true,length : 255})
   name : string | null
 
-  @Column("text")
+  @Column("longtext")
   picture : string | null
 
   @Column("varchar",{name : "email",nullable : true,length : 255})
