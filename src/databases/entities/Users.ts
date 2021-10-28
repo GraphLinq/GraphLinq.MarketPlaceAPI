@@ -12,9 +12,7 @@ export default class Users {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @MinLength(3,{
-    message : 'Name is to short'
-  })
+
   @MaxLength(255,{
     message : 'Name is to big'
   })
