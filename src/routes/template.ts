@@ -59,7 +59,7 @@ router.get('/',async(req,res) => {
 
         var resultsQuery = await builder.getMany()
         resultsQuery.map(template => {
-            if(template.assets !== undefined)
+            if(template.assets === undefined)
               template.assets = []
               if(template.youtube !== ""){
                 template.assets.unshift({
@@ -201,7 +201,7 @@ router.get('/names/:name',async(req,res)=>{
 
         var resultsQuery = await builder.getMany()
         resultsQuery.map(template => {
-            if(template.assets !== undefined)
+            if(template.assets === undefined)
               template.assets = []
               if(template.youtube !== ""){
                 template.assets.unshift({
@@ -488,7 +488,7 @@ router.get('/:template_id',async(req,res)=>{
         var resultsQuery = await builder.getOne()
         
         
-        if(resultsQuery.assets !== undefined)
+        if(resultsQuery.assets === undefined)
             resultsQuery.assets = []
             if(resultsQuery.youtube !== ""){
                 resultsQuery.assets.unshift({

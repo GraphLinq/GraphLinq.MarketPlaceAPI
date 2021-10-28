@@ -132,7 +132,7 @@ router.get('/:user_id/templates/published',async(req,res) => {
       }else{
 
         user.publishedTemplates.map(template => {
-          if(template.assets !== undefined)
+          if(template.assets === undefined)
             template.assets = []
             if(template.youtube !== ""){
               template.assets.unshift({
@@ -178,7 +178,7 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
         const templates = userData.purchasedTemplates.map( purchased => purchased.template)
         
         templates.map(template => {
-            if(template.assets !== undefined)
+            if(template.assets === undefined)
               template.assets = []
             
             if(template.youtube !== ""){
