@@ -67,6 +67,28 @@ router.get('/:user_id',async(req,res) => {
   }
 })
 
+router.get('/addr/:user_addr',async(req,res) => {
+  try{
+
+    let user: Users | undefined = await getConnection().getRepository(Users).findOne({publicAddress: req.params.user_addr})
+
+    if(user == undefined){
+       return res.status(500).send();
+    }else{
+      res.send({
+        name : user.name,
+        email : user.email,
+        picture : user.picture,
+        id : user.publicAddress
+      })
+    }
+
+  }catch (error){
+
+    return res.status(500).send();
+  }
+})
+
 router.put('/:user_id/profile/',authentification,async(req,res) => {
 
       const authentification : any = (req as any).authentification
@@ -106,7 +128,7 @@ router.put('/:user_id/profile/',authentification,async(req,res) => {
         }
 
       }catch (error){
-
+console.log(error)
         return res.status(500).send();
       }
       
