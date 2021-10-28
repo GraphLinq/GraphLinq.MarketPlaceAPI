@@ -168,6 +168,7 @@ router.get('/:user_id/templates/purchased',async(req,res) => {
       .leftJoinAndSelect("template.category", "category")
       .leftJoinAndSelect("template.likes", "like")
       .leftJoinAndSelect("template.versions", "versions")
+      .leftJoinAndSelect("template.assets", "assets")
 
       .where("user.id = :id",{id : Number(req.params.user_id)})
       .getOne();
