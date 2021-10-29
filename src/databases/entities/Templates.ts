@@ -37,6 +37,8 @@ export default class Templates {
   @Column("text")
   youtube : string | null
 
+  @Column("bool",{name : "is_published",default : false})
+  is_published : boolean 
 
   @ManyToOne(type => Users)
   @JoinColumn({name: 'user_id', referencedColumnName: 'id'})

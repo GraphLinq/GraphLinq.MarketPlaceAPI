@@ -100,6 +100,7 @@ router.post('/',authentification,async(req,res)=>{
         template.youtube = req.body.youtube
         template.user = user
         template.category = await getConnection().getRepository(Categories).findOne({id : req.body.category_id})
+        template.is_published = false
         var assets: TemplatesAssets[] = []
         req.body.images.forEach((value: string) => {
             var asset:TemplatesAssets = new  TemplatesAssets 
@@ -369,6 +370,23 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
         .where("template.id = :id",{id : Number(req.params.template_id)})
         .getOne();
 
+        // todo: very dirty refactor this after ... 
+        if(parseInt(template.template_cost) == 0){
+            let templateVersion  : TemplatesVersion | undefined =  template.versions.
+                                    find(x=> x.id == Number(req.params.version))
+            
+            if(templateVersion == undefined){
+                return res.status(500).send({success : false});  
+            }else{
+                res.send({
+                    success : true,
+                    results : templateVersion.raw_bytes
+                })
+            }
+
+            return;
+        }
+
         let userData: Users | undefined = await getConnection()
         .getRepository(Users)
         .createQueryBuilder("user")
@@ -376,6 +394,7 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
         .leftJoinAndSelect("user.purchasedTemplates", "purchased")
         .leftJoinAndSelect("purchased.template", "template")
         .getOne();
+
 
         // the user has not bought the template
         if(userData.purchasedTemplates === undefined || 
@@ -402,6 +421,28 @@ router.get('/:template_id/:version/download',authentification,async(req,res)=>{
     }
 })
 
+
+router.put('/:template_id/publish',authentification,async(req,res)=>{
+    try{
+        let template : Templates | undefined =  await getConnection().getRepository(Templates)
+        .createQueryBuilder('template')
+        .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
+        .leftJoinAndSelect("template.user", "user")
+        .leftJoinAndSelect("template.category", "category")
+        .leftJoinAndSelect("template.versions", "versions")
+        .addSelect('versions.raw_bytes')
+        .addSelect('versions.created_at')
+        .addSelect('versions.updated_at')
+        .getOne()
+
+        template.is_published = true
+        await getConnection().getRepository(Templates).save(template)
+        res.send({reponse:"success"})
+    }catch(error){
+        res.status(500).send()
+    }
+    
+});
 router.put('/:template_id/edit',authentification,async(req,res)=>{
     const authentification : any = (req as any).authentification
     var address: string  = String(authentification.addr)
