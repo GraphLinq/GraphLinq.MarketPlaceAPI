@@ -412,8 +412,11 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
         .createQueryBuilder('template')
         .where("template.id = :template_id",{template_id : Number(req.params.template_id)})
         .leftJoinAndSelect("template.user", "user")
-        .leftJoinAndSelect("template.versions", "versions")
         .leftJoinAndSelect("template.category", "category")
+        .leftJoinAndSelect("template.versions", "versions")
+        .addSelect('versions.raw_bytes')
+        .addSelect('versions.created_at')
+        .addSelect('versions.updated_at')
         .getOne()
 
         if(template.user.id == user.id){
@@ -441,10 +444,10 @@ router.put('/:template_id/edit',authentification,async(req,res)=>{
 
             }else{
                 var template_version = template.versions.find( x => x.id == Number(req.body.version_id))
-
-                if(req.body.data.trim().length > 0)
-                    template_version.raw_bytes = req.body.data // todo : check with the api if the data works and is executed correctly
-                
+                if(req.body.data.trim().length > 0){
+                   template_version.raw_bytes = req.body.data 
+                }
+                          
                 template_version.execution_cost =  0.0 // todo : get the cost with api
                 
                 const errors = await validate(template_version)
